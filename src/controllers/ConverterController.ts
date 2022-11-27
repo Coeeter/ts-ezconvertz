@@ -19,11 +19,21 @@ class ConverterController {
     let finished: string[] = [];
     videoDataList.forEach(async videoData => {
       try {
+        const args = {
+          session,
+          ...videoData,
+        };
         await runPythonScript('scripts/converter.py', {
           mode: 'text',
-          args: [session, videoData.videoId, videoData.name],
+          args: [JSON.stringify(args)],
         });
-        const folderPath = path.join(__dirname, '..', 'downloads', session);
+        const folderPath = path.join(
+          __dirname,
+          '..',
+          '..',
+          'downloads',
+          session
+        );
         const filePath = path.join(folderPath, `${videoData.name}.mp3`);
         finished = [...new Set([...finished, filePath])];
         if (finished.length !== videoDataList.length) return;
@@ -35,6 +45,7 @@ class ConverterController {
           await unlink(zipPath);
         });
       } catch (e) {
+        console.log(e);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: e });
       }
     });
