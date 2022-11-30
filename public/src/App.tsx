@@ -1,15 +1,12 @@
-import {
-  ChakraProvider,
-  extendTheme,
-  Theme,
-  theme as defaultTheme,
-} from '@chakra-ui/react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ChakraProvider, theme as defaultTheme, Theme } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import './App.css';
+import Navbar from './components/Navbar';
 import { VideoServiceProvider } from './context/VideoServiceContext';
 import Completion from './pages/Completion';
 import Home from './pages/Home';
 import Landing from './pages/Landing';
-import './App.css';
 
 function App() {
   const theme: Theme = {
@@ -26,8 +23,9 @@ function App() {
         <VideoServiceProvider>
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/completed" element={<Completion />} />
+            <Route path="/convert" element={<Home />}>
+              <Route path="/convert/completion" element={<Completion />} />
+            </Route>
           </Routes>
         </VideoServiceProvider>
       </ChakraProvider>

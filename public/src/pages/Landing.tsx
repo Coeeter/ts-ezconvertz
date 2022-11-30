@@ -5,7 +5,7 @@ import {
   Heading,
   HStack,
   Image,
-  VStack,
+  VStack
 } from '@chakra-ui/react';
 import { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
@@ -36,10 +36,9 @@ export default function Landing() {
           >
             <Button
               w="100%"
-              bg="red.500"
               as={Link}
-              to="/home"
-              display="flex"
+              to="/convert"
+              bg="red.500"
               _hover={{ bg: 'red.600' }}
               _active={{ bg: 'red.700' }}
             >
