@@ -1,6 +1,7 @@
+import { useNavigate } from 'react-router-dom';
+
 import { Button, Center, Heading, VStack } from '@chakra-ui/react';
 import CheckIcon from '@mui/icons-material/Check';
-import { useNavigate } from 'react-router-dom';
 
 export default function Completion() {
   const navigate = useNavigate();

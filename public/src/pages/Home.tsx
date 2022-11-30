@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { Outlet, useNavigate } from 'react-router-dom';
+
 import {
   Box,
   Button,
@@ -6,9 +10,7 @@ import {
   Spinner,
   VStack,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { Outlet, useNavigate } from 'react-router-dom';
+
 import FormItem from '../components/FormItem';
 import Navbar from '../components/Navbar';
 import { useService } from '../context/VideoServiceContext';

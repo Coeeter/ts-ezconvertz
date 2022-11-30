@@ -1,3 +1,6 @@
+import { CSSProperties } from 'react';
+import { Link } from 'react-router-dom';
+
 import {
   Box,
   Button,
@@ -5,10 +8,8 @@ import {
   Heading,
   HStack,
   Image,
-  VStack
+  VStack,
 } from '@chakra-ui/react';
-import { CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
 
 export default function Landing() {
   return (
