@@ -24,7 +24,7 @@ export default function Completion() {
           w="80%"
           _hover={{ bg: 'red.600' }}
           _active={{ bg: 'red.700' }}
-          onClick={() => navigate('/convert')}
+          onClick={() => navigate('/')}
         >
           Convert more
         </Button>

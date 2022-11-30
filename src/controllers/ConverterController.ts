@@ -7,6 +7,26 @@ import { zip } from 'zip-a-folder';
 import runPythonScript from '../utils/runPythonScript';
 
 class ConverterController {
+  getDataOfVideo = async (req: Request, res: Response) => {
+    const { videoId } = req.body;
+    if (!videoId || videoId.length == 0)
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: 'Invalid videoId' });
+    try {
+      const [result] = await runPythonScript('scripts/get-data.py', {
+        mode: 'text',
+        args: [videoId],
+      });
+      res.json(JSON.parse(result));
+    } catch (e) {
+      console.log(e);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: e,
+      });
+    }
+  };
+
   convertAndDownloadAudioAsZip = (req: Request, res: Response) => {
     const session = v4();
     console.log(`session: ${session}`);
@@ -16,6 +36,15 @@ class ConverterController {
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: 'Invalid videos' });
     const videoDataList: VideoData[] = videos;
+    if (
+      videoDataList.some(
+        data =>
+          data.end == null || data.start == null || !data.name || !data.videoId
+      )
+    )
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: 'Invalid videos' });
     let finished: string[] = [];
     videoDataList.forEach(async videoData => {
       try {
