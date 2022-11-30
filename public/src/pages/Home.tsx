@@ -8,6 +8,7 @@ import {
   CloseButton,
   HStack,
   Spinner,
+  useToast,
   VStack,
 } from '@chakra-ui/react';
 
@@ -25,6 +26,7 @@ export type FormValues = {
 };
 
 export default function Home() {
+  const toast = useToast();
   const service = useService();
   const navigate = useNavigate();
   const [isFinished, setIsFinished] = useState(false);
@@ -46,8 +48,20 @@ export default function Home() {
         end: service?.transformTimeStringToSeconds(vid.end),
       }))
     )!;
+    const response = JSON.parse(await blob.text());
     setIsLoading(false);
     setIsFinished(true);
+    if (response.message || response.error) {
+      toast({
+        title: 'Error',
+        description: response.message || response.error || 'Unknown error',
+        duration: 10000,
+        isClosable: false,
+      });
+      return console.error(
+        response.message || response.error || 'Unknown error'
+      );
+    }
     fields.forEach((item, index) => remove(index));
     const file = window.URL.createObjectURL(blob);
     window.location.assign(file);
