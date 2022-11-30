@@ -8,7 +8,6 @@ import {
   CloseButton,
   HStack,
   Spinner,
-  useToast,
   VStack,
 } from '@chakra-ui/react';
 
@@ -26,12 +25,12 @@ export type FormValues = {
 };
 
 export default function Home() {
-  const toast = useToast();
   const service = useService();
   const navigate = useNavigate();
   const [isFinished, setIsFinished] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { control, setValue, setError, handleSubmit } = useForm<FormValues>();
+  const [currentFieldSize, setCurrentFieldSize] = useState(1);
+  const { control, setValue, handleSubmit } = useForm<FormValues>();
   const { fields, append, remove } = useFieldArray({
     name: 'videos',
     control,
@@ -40,7 +39,7 @@ export default function Home() {
   const onSubmit = async ({ videos }: FormValues) => {
     setIsLoading(true);
     const filtered = videos.filter(vid => vid.videoId.length != 0);
-    if (filtered.length == 0) return;
+    if (filtered.length == 0) return setIsLoading(false);
     const blob = await service?.downloadFromLinks(
       filtered.map(vid => ({
         ...vid,
@@ -48,20 +47,8 @@ export default function Home() {
         end: service?.transformTimeStringToSeconds(vid.end),
       }))
     )!;
-    const response = JSON.parse(await blob.text());
     setIsLoading(false);
     setIsFinished(true);
-    if (response.message || response.error) {
-      toast({
-        title: 'Error',
-        description: response.message || response.error || 'Unknown error',
-        duration: 10000,
-        isClosable: false,
-      });
-      return console.error(
-        response.message || response.error || 'Unknown error'
-      );
-    }
     fields.forEach((item, index) => remove(index));
     const file = window.URL.createObjectURL(blob);
     window.location.assign(file);
@@ -75,6 +62,21 @@ export default function Home() {
   useEffect(() => {
     if (isFinished) navigate('/convert/completion');
   }, [isFinished]);
+
+  useEffect(() => {
+    if (fields.length > currentFieldSize) {
+      setCurrentFieldSize(prev => {
+        return prev + 1;
+      });
+      return window.scrollTo({
+        top: document.body.clientHeight,
+        behavior: 'smooth',
+      });
+    }
+    setCurrentFieldSize(prev => {
+      return prev - 1;
+    });
+  }, [fields]);
 
   return (
     <VStack minH="100vh">

@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import path from 'path';
 import envConfig from './config/EnvConvig';
 import ConverterController from './controllers/ConverterController';
@@ -14,7 +14,7 @@ const controller = new ConverterController();
 app.post('/api/get-data', controller.getDataOfVideo);
 app.post('/api/convert', controller.convertAndDownloadAudioAsZip);
 
-app.get('/', (req: Request, res: Response) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   const pathToFile = path.join(__dirname, '..', 'public', 'dist', 'index.html');
   res.sendFile(pathToFile);
 });

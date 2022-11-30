@@ -24,11 +24,8 @@ file = video.download(output_path=output_path, filename=file_name)
 audio = AudioSegment.from_file(file)
 audio_length = audio.duration_seconds
 
-if end == -1:
+if end == -1 or end > audio_length:
   end = audio_length
-
-if end > audio_length:
-  raise Exception(f'Invalid end value provided')
 
 start *= 1000
 end *= 1000
