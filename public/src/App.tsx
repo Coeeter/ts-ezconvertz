@@ -24,9 +24,8 @@ function App() {
         <VideoServiceProvider>
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/convert" element={<Home />}>
-              <Route path="/convert/completion" element={<Completion />} />
-            </Route>
+            <Route path="/convert" element={<Home />} />
+            <Route path="/completion" element={<Completion />} />
           </Routes>
         </VideoServiceProvider>
       </ChakraProvider>

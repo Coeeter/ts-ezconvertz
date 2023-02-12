@@ -64,19 +64,18 @@ class VideoService {
 
   /**
    * Given an array of youtube video ids,
-   * function will return blob,
-   * containing all converted videos in zip format
+   * function will return url to download zip file,
+   * of converted videos.
    *
    * ```js
-   * const blob = await service.downloadFromLinks(data);
-   * const file = window.URL.createObjectURL(blob);
-   * window.location.assign(file);
+   * const url = await service.downloadFromLinks(data);
+   * window.location.assign(url);
    * ```
    *
    * @param data array of videos which need to be converted
-   * @returns a blob which can be used to download the file
+   * @returns an object containing the url to download zip from
    */
-  downloadFromLinks = async (data: VideoData[]) => {
+  getDownloadUrl = async (data: VideoData[]): Promise<string> => {
     return await fetch(`${this.baseUrl}/api/convert`, {
       method: 'POST',
       headers: {
@@ -85,7 +84,27 @@ class VideoService {
       body: JSON.stringify({
         videos: data,
       }),
-    }).then(response => response.blob());
+    })
+      .then(response => response.json() as Promise<{ url: string }>)
+      .then(result => `${this.baseUrl}${result.url}`);
+  };
+
+  /**
+   * Function to delete the zip file just downloaded from the server
+   *
+   * @param zipFileName the file name of the zip just downloaded
+   * @returns the response of the api call
+   */
+  deleteFile = async (zipFileName: string) => {
+    return await fetch(`${this.baseUrl}/api/zip`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        zipName: zipFileName,
+      }),
+    });
   };
 }
 
