@@ -69,15 +69,22 @@ class ConverterController {
         const zipPath = path.join(folderPath, '..', `${session}.zip`);
         await zip(folderPath, zipPath);
         if (res.headersSent) return;
-        res.download(zipPath, async () => {
-          await rm(folderPath, { recursive: true });
-          await unlink(zipPath);
+        await rm(folderPath, { recursive: true });
+        res.json({
+          url: `/downloads/${session}.zip`,
         });
       } catch (e) {
         console.log(e);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: e });
       }
     });
+  };
+
+  deleteZip = async (req: Request, res: Response) => {
+    const { zipName } = req.body;
+    const filePath = path.join(__dirname, '..', '..', 'downloads', zipName);
+    await unlink(filePath);
+    res.sendStatus(StatusCodes.OK);
   };
 }
 
