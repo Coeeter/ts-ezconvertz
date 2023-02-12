@@ -17,7 +17,7 @@ export default function Navbar() {
   return (
     <Box
       w="100%"
-      bg={colorMode == 'dark' ? 'whiteAlpha.200' : 'gray.200'}
+      bg={colorMode == 'dark' ? 'whiteAlpha.200' : 'red.200'}
       p={5}
       as={HStack}
       justifyContent="space-between"
@@ -29,6 +29,7 @@ export default function Navbar() {
       <IconButton
         aria-label="Toggle dark and light mode"
         size="lg"
+        colorScheme={colorMode == 'dark' ? 'gray' : 'red'}
         onClick={toggleColorMode}
       >
         {colorMode == 'dark' ? <SunIcon /> : <MoonIcon />}

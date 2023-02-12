@@ -1,8 +1,8 @@
 import './App.css';
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-
-import { ChakraProvider, theme as defaultTheme, Theme } from '@chakra-ui/react';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { mode } from '@chakra-ui/theme-tools';
 
 import { VideoServiceProvider } from './context/VideoServiceContext';
 import Completion from './pages/Completion';
@@ -10,13 +10,19 @@ import Home from './pages/Home';
 import Landing from './pages/Landing';
 
 function App() {
-  const theme: Theme = {
-    ...defaultTheme,
+  const theme = extendTheme({
     config: {
       initialColorMode: 'dark',
       useSystemColorMode: false,
     },
-  };
+    styles: {
+      global: (props: Record<string, string>) => ({
+        body: {
+          bgColor: mode("#ffe0e0", "#1A202C")(props),
+        },
+      }),
+    },
+  });
 
   return (
     <BrowserRouter>

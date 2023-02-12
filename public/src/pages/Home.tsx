@@ -8,6 +8,7 @@ import {
   CloseButton,
   HStack,
   Spinner,
+  useColorMode,
   VStack,
 } from '@chakra-ui/react';
 
@@ -25,6 +26,7 @@ export type FormValues = {
 };
 
 export default function Home() {
+  const { colorMode } = useColorMode();
   const service = useService();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -34,6 +36,15 @@ export default function Home() {
     name: 'videos',
     control,
   });
+
+  const btnProps =
+    colorMode == 'light'
+      ? {
+          bg: 'red.200',
+          _hover: { bg: 'red.300' },
+          _active: { bg: 'red.400' },
+        }
+      : {};
 
   const onSubmit = async ({ videos }: FormValues) => {
     setIsLoading(true);
@@ -78,7 +89,12 @@ export default function Home() {
   return (
     <VStack minH="100vh">
       <Navbar />
-      <Box w="100%" p={10} display="flex" justifyContent="center">
+      <Box
+        w="100%"
+        p={{ base: 5, sm: 10 }}
+        display="flex"
+        justifyContent="center"
+      >
         <VStack
           as="form"
           onSubmit={handleSubmit(onSubmit)}
@@ -110,6 +126,7 @@ export default function Home() {
               onClick={() => {
                 append({ name: '', videoId: '', end: '', start: '' });
               }}
+              {...btnProps}
             >
               Add Video
             </Button>
