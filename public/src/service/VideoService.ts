@@ -16,6 +16,16 @@ class VideoService {
   }
 
   /**
+   * Function to retrieve the download url of a zip file given the session
+   * 
+   * @param session the session of the zip file
+   * @returns the download url of the zip file
+   */
+  getDownloadUrl = (session: string) => {
+    return `${this.baseUrl}/api/download/${session}`;
+  };
+
+  /**
    * Function to transform time string to seconds
    *
    * @param time in format HH:MM:SS
@@ -64,18 +74,19 @@ class VideoService {
 
   /**
    * Given an array of youtube video ids,
-   * function will return url to download zip file,
-   * of converted videos.
+   * function will return session of the request
+   * which can be used to download the zip file
    *
    * ```js
-   * const url = await service.downloadFromLinks(data);
+   * const session = await service.downloadFromLinks(data);
+   * const url = `${baseURL}/api/zip/${session}.zip`;
    * window.location.assign(url);
    * ```
    *
    * @param data array of videos which need to be converted
    * @returns an object containing the url to download zip from
    */
-  getDownloadUrl = async (data: VideoData[]): Promise<string> => {
+  convertVideos = async (data: VideoData[]): Promise<string> => {
     return await fetch(`${this.baseUrl}/api/convert`, {
       method: 'POST',
       headers: {
@@ -85,26 +96,8 @@ class VideoService {
         videos: data,
       }),
     })
-      .then(response => response.json() as Promise<{ url: string }>)
-      .then(result => `${this.baseUrl}${result.url}`);
-  };
-
-  /**
-   * Function to delete the zip file just downloaded from the server
-   *
-   * @param zipFileName the file name of the zip just downloaded
-   * @returns the response of the api call
-   */
-  deleteFile = async (zipFileName: string) => {
-    return await fetch(`${this.baseUrl}/api/zip`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        zipName: zipFileName,
-      }),
-    });
+      .then(response => response.json() as Promise<{ session: string }>)
+      .then(result => result.session);
   };
 }
 

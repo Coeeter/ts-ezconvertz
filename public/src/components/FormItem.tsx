@@ -89,6 +89,17 @@ export default function FormItem({
       );
   }, [videoMetaData]);
 
+  useEffect(() => {
+    if (isLoading) return;
+    const timeout = setTimeout(() => {
+      window.scrollTo({
+        top: document.body.clientHeight,
+        behavior: 'smooth',
+      });
+    }, 100)
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
+
   return (
     <VStack
       w="100%"

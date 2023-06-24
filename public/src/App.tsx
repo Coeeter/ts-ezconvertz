@@ -5,7 +5,7 @@ import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { mode } from '@chakra-ui/theme-tools';
 
 import { VideoServiceProvider } from './context/VideoServiceContext';
-import Completion from './pages/Completion';
+import Download from './pages/Download';
 import Home from './pages/Home';
 import Landing from './pages/Landing';
 
@@ -18,7 +18,7 @@ function App() {
     styles: {
       global: (props: Record<string, string>) => ({
         body: {
-          bgColor: mode("#ffe0e0", "#1A202C")(props),
+          bgColor: mode('#ffe0e0', '#1A202C')(props),
         },
       }),
     },
@@ -31,7 +31,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/convert" element={<Home />} />
-            <Route path="/completion" element={<Completion />} />
+            <Route path="/download" element={<Download />} />
           </Routes>
         </VideoServiceProvider>
       </ChakraProvider>

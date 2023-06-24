@@ -50,20 +50,14 @@ export default function Home() {
     setIsLoading(true);
     const filtered = videos.filter(vid => vid.videoId.length != 0);
     if (filtered.length == 0) return setIsLoading(false);
-    const url = await service?.getDownloadUrl(
+    const url = await service?.convertVideos(
       filtered.map(vid => ({
         ...vid,
         start: service?.transformTimeStringToSeconds(vid.start),
         end: service?.transformTimeStringToSeconds(vid.end),
       }))
     )!;
-    window.location.assign(url);
-    setTimeout(() => {
-      setIsLoading(false);
-      const startIndex = url.lastIndexOf('/') + 1;
-      const path = url.substring(startIndex);
-      navigate(`/completion?p=${path}`);
-    }, 500);
+    navigate(`/download?p=${url}`)
   };
 
   useEffect(() => {

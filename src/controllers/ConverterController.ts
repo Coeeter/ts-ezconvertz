@@ -1,24 +1,32 @@
 import { Request, Response } from 'express';
-import { rm, unlink } from 'fs/promises';
+import ffmpeg from 'fluent-ffmpeg';
+import { createReadStream, createWriteStream } from 'fs';
+import { mkdir, rm, unlink, writeFile } from 'fs/promises';
 import { StatusCodes } from 'http-status-codes';
 import path from 'path';
 import { v4 } from 'uuid';
+import ytdl from 'ytdl-core';
 import { zip } from 'zip-a-folder';
-import runPythonScript from '../utils/runPythonScript';
 
 class ConverterController {
   getDataOfVideo = async (req: Request, res: Response) => {
     const { videoId } = req.body;
+    await writeFile(
+      path.join(__dirname, '..', '..', 'requests', `${videoId}.json`),
+      JSON.stringify({ videoId }, null, 2)
+    );
     if (!videoId || videoId.length == 0)
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: 'Invalid videoId' });
     try {
-      const [result] = await runPythonScript('scripts/get-data.py', {
-        mode: 'text',
-        args: [videoId],
+      const video = await ytdl.getInfo(videoId);
+      const lastPic = video.videoDetails.thumbnails.length - 1;
+      res.json({
+        name: video.videoDetails.title,
+        length: video.videoDetails.lengthSeconds,
+        thumbnail: video.videoDetails.thumbnails[lastPic].url,
       });
-      res.json(JSON.parse(result));
     } catch (e) {
       console.log(e);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -27,7 +35,7 @@ class ConverterController {
     }
   };
 
-  convertAndDownloadAudioAsZip = (req: Request, res: Response) => {
+  convertAndDownloadAudioAsZip = async (req: Request, res: Response) => {
     const session = v4();
     console.log(`session: ${session}`);
     const { videos } = req.body;
@@ -45,46 +53,89 @@ class ConverterController {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: 'Invalid videos' });
-    let finished: string[] = [];
-    videoDataList.forEach(async videoData => {
+    await writeFile(
+      path.join(__dirname, '..', '..', 'requests', `${session}.json`),
+      JSON.stringify(videoDataList, null, 2)
+    );
+    const outputPath = path.join(__dirname, '..', '..', 'downloads', session);
+    await mkdir(outputPath, { recursive: true });
+    const conversions = videoDataList.map(async videoData => {
       try {
-        const args = {
-          session,
-          ...videoData,
-        };
-        await runPythonScript('scripts/converter.py', {
-          mode: 'text',
-          args: [JSON.stringify(args)],
-        });
-        const folderPath = path.join(
-          __dirname,
-          '..',
-          '..',
-          'downloads',
-          session
+        const url = `https://youtube.com/watch?v=${videoData.videoId}`;
+        const outputFilePath = path.join(
+          outputPath,
+          `unclipped_${videoData.name}.mp3`
         );
-        const filePath = path.join(folderPath, `${videoData.name}.mp3`);
-        finished = [...new Set([...finished, filePath])];
-        if (finished.length !== videoDataList.length) return;
-        const zipPath = path.join(folderPath, '..', `${session}.zip`);
-        await zip(folderPath, zipPath);
-        if (res.headersSent) return;
-        await rm(folderPath, { recursive: true });
-        res.json({
-          url: `/downloads/${session}.zip`,
+        const clippedOutputFilePath = path.join(
+          outputPath,
+          `${videoData.name}.mp3`
+        );
+        await new Promise(async (resolve, reject) => {
+          try {
+            const info = await ytdl.getInfo(url);
+            const audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
+            const audioStream = ytdl.downloadFromInfo(info, {
+              format: audioFormats[0],
+            });
+            audioStream.pipe(createWriteStream(outputFilePath, { flags: 'w' }));
+            audioStream.on('end', resolve);
+          } catch (e) {
+            reject(e);
+          }
         });
+        await new Promise((resolve, reject) => {
+          ffmpeg(outputFilePath)
+            .setStartTime(videoData.start)
+            .setDuration(videoData.end - videoData.start)
+            .audioBitrate(128)
+            .output(clippedOutputFilePath)
+            .on('end', resolve)
+            .on('error', reject)
+            .run();
+        });
+        await unlink(outputFilePath);
       } catch (e) {
         console.log(e);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: e });
+        throw e;
       }
     });
+    try {
+      await Promise.all(conversions);
+      const zipPath = path.join(outputPath, '..', `${session}.zip`);
+      await zip(outputPath, zipPath);
+      await rm(outputPath, { recursive: true });
+      if (res.headersSent) return;
+      res.json({ session });
+    } catch (e) {
+      console.log(e);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: e });
+    }
   };
 
-  deleteZip = async (req: Request, res: Response) => {
-    const { zipName } = req.body;
-    const filePath = path.join(__dirname, '..', '..', 'downloads', zipName);
-    await unlink(filePath);
-    res.sendStatus(StatusCodes.OK);
+  downloadZip = async (req: Request, res: Response) => {
+    try {
+      const { session } = req.params;
+      const filePath = path.join(
+        __dirname,
+        '..',
+        '..',
+        'downloads',
+        `${session}.zip`
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename=${session}.zip`
+      );
+      res.setHeader('Content-Type', 'application/zip');
+      const fileStream = createReadStream(filePath);
+      fileStream.pipe(res);
+      fileStream.on('end', async () => {
+        await unlink(filePath);
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: e });
+    }
   };
 }
 

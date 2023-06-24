@@ -1,11 +1,11 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { Button, Center, Heading, VStack, Image, Box } from '@chakra-ui/react';
+import { Button, Center, Heading, VStack, Image } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useService } from '../context/VideoServiceContext';
 import Navbar from '../components/Navbar';
 
-export default function Completion() {
+export default function Download() {
   const service = useService();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -13,7 +13,7 @@ export default function Completion() {
 
   useEffect(() => {
     if (!path) return;
-    service?.deleteFile(path);
+    window.location.assign(service?.getDownloadUrl(path)!);
   }, [path]);
 
   return (
