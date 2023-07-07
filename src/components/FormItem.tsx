@@ -24,8 +24,8 @@ import {
 } from '@chakra-ui/react';
 
 import { useService } from '../context/VideoServiceContext';
-import { FormValues } from '../pages/Home';
-import { YoutubeMetaData } from '../service/VideoService';
+import { FormValues } from '../pages/convert';
+import YoutubeMetaData from '@/models/YoutubeMetaData';
 
 export default function FormItem({
   index,
@@ -60,7 +60,7 @@ export default function FormItem({
       setIsLoading(false);
       return setError('url', { message: 'Invalid youtube url given' });
     }
-    const data = await service?.getDataFromLink(videoId);
+    const data = await service.getDataFromLink(videoId);
     if (!data) return;
     setVideoMetaData(data);
     setIsLoading(false);
@@ -96,7 +96,7 @@ export default function FormItem({
         top: document.body.clientHeight,
         behavior: 'smooth',
       });
-    }, 100)
+    }, 100);
     return () => clearTimeout(timeout);
   }, [isLoading]);
 

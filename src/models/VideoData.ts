@@ -1,6 +1,8 @@
 interface VideoData {
-  videoId: string;
   name: string;
+  videoId: string;
   start: number;
   end: number;
 }
+
+export default VideoData;

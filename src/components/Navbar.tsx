@@ -1,5 +1,3 @@
-import { useNavigate } from 'react-router-dom';
-
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import {
   Box,
@@ -9,10 +7,10 @@ import {
   Image,
   useColorMode,
 } from '@chakra-ui/react';
+import Link from 'next/link';
 
 export default function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
-  const navigate = useNavigate();
 
   return (
     <Box
@@ -22,7 +20,7 @@ export default function Navbar() {
       as={HStack}
       justifyContent="space-between"
     >
-      <HStack cursor="pointer" onClick={() => navigate('/')}>
+      <HStack cursor="pointer" as={Link} href="/">
         <Image src="ezconvertz-logo.svg" w="3rem" />
         <Heading size="md">EZConvertz</Heading>
       </HStack>

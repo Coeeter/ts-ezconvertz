@@ -1,15 +1,13 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
-
 import { Button, Center, Heading, VStack, Image } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useService } from '../context/VideoServiceContext';
 import Navbar from '../components/Navbar';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export default function Download() {
   const service = useService();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const path = searchParams.get('p');
+  const path = useRouter().query.p as string;
 
   useEffect(() => {
     if (!path) return;
@@ -35,9 +33,10 @@ export default function Download() {
           <Button
             bg="red.500"
             w="80%"
+            as={Link}
+            href="/convert"
             _hover={{ bg: 'red.600' }}
             _active={{ bg: 'red.700' }}
-            onClick={() => navigate('/convert')}
           >
             Convert more
           </Button>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 
 import {
   Box,
@@ -12,6 +11,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 
+import { useRouter } from 'next/router';
 import FormItem from '../components/FormItem';
 import Navbar from '../components/Navbar';
 import { useService } from '../context/VideoServiceContext';
@@ -25,10 +25,10 @@ export type FormValues = {
   }[];
 };
 
-export default function Home() {
+export default function Convert() {
   const { colorMode } = useColorMode();
   const service = useService();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [currentFieldSize, setCurrentFieldSize] = useState(1);
   const { control, setValue, handleSubmit } = useForm<FormValues>();
@@ -46,18 +46,18 @@ export default function Home() {
         }
       : {};
 
-  const onSubmit = async ({ videos }: FormValues) => {
+  const onSubmit: SubmitHandler<FormValues> = async ({ videos }) => {
     setIsLoading(true);
     const filtered = videos.filter(vid => vid.videoId.length != 0);
     if (filtered.length == 0) return setIsLoading(false);
-    const url = await service?.convertVideos(
+    const url = await service.convertVideos(
       filtered.map(vid => ({
         ...vid,
         start: service?.transformTimeStringToSeconds(vid.start),
         end: service?.transformTimeStringToSeconds(vid.end),
       }))
     )!;
-    navigate(`/download?p=${url}`)
+    router.push(`/download?p=${url}`);
   };
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export default function Home() {
           gap={3}
         >
           {fields.map((field, index) => (
-            <Box w="100%" position="relative" overflow="hidden">
+            <Box w="100%" position="relative" overflow="hidden" key={index}>
               <FormItem
                 key={field.id}
                 index={index}
@@ -116,6 +116,7 @@ export default function Home() {
           <HStack w="100%" gap={3}>
             <Button
               w="50%"
+              key="add"
               isDisabled={isLoading}
               onClick={() => {
                 append({ name: '', videoId: '', end: '', start: '' });
@@ -126,6 +127,7 @@ export default function Home() {
             </Button>
             <Button
               w="50%"
+              key="submit"
               isDisabled={isLoading}
               type="submit"
               bg="red.500"
