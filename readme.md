@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="public/public/ezconvertz-logo.svg" alt="Youtube To MP3" width="200">
+  <img src="public/ezconvertz-logo.svg" alt="Youtube To MP3" width="200">
 
 EZConvertz
 
