@@ -43,24 +43,14 @@ npm start
 ```
 
 ## Built Using
-- Node Js
-  - TypeScript
-  - cors
-  - dotenv
-  - express
-  - uuid
-  - zip-a-folder
-  - python-shell
-  - http-status-codes
-- Python Scripts
-  - pytube
-  - pydub
-- React
-  - vite
-  - TypeScript
-  - Chakra UI
-  - react-hook-form
-  - react-router-dom
+- NextJS
+- Typescript
+- Chakra UI
+- AWS SDK
+- fluent-ffmpeg
+- uuid
+- ytdl-core
+- zip-a-folder
 
 ## Disclaimer
 
