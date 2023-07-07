@@ -16,10 +16,8 @@ const VideoServiceContext = createContext<VideoServiceContextType | undefined>(
 );
 
 export const VideoServiceProvider = ({ children }: React.PropsWithChildren) => {
-  const baseUrl = process.env.NEXT_PUBLIC_URL;
-
   const getDownloadUrl = (session: string) => {
-    return `${baseUrl}/api/download/${session}`;
+    return `/api/download/${session}`;
   };
 
   const transformTimeStringToSeconds = (time: string) => {
@@ -37,7 +35,7 @@ export const VideoServiceProvider = ({ children }: React.PropsWithChildren) => {
   };
 
   const getDataFromLink = async (videoId: string) => {
-    const res = await fetch(`${baseUrl}/api/video/${videoId}`);
+    const res = await fetch(`/api/video/${videoId}`);
     if (!res.ok) return;
     const data = await res.json();
     return {
@@ -47,7 +45,7 @@ export const VideoServiceProvider = ({ children }: React.PropsWithChildren) => {
   };
 
   const convertVideos = async (data: VideoData[]) => {
-    const res = await fetch(`${baseUrl}/api/convert`, {
+    const res = await fetch(`/api/convert`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
