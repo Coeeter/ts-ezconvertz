@@ -1,12 +1,12 @@
 import VideoData from '@/models/VideoData';
 import { mkdir, readFile, rm } from 'fs/promises';
 import ytdl from 'ytdl-core';
-import ffmpeg from 'fluent-ffmpeg';
 import { S3 } from 'aws-sdk';
 import path from 'path';
 import { zip } from 'zip-a-folder';
 import Status from '@/models/Status';
 import ffmpegstatic from 'ffmpeg-static';
+import Ffmpeg from 'fluent-ffmpeg';
 
 const streamAndClipAudio = async (
   url: string,
@@ -16,8 +16,8 @@ const streamAndClipAudio = async (
 ) => {
   return new Promise((resolve, reject) => {
     const audioStream = ytdl(url, { filter: 'audioonly' });
-    ffmpeg.setFfmpegPath(ffmpegstatic!);
-    ffmpeg(audioStream)
+    Ffmpeg.setFfmpegPath(ffmpegstatic!);
+    Ffmpeg(audioStream)
       .setStartTime(start)
       .setDuration(end - start)
       .audioBitrate(128)
