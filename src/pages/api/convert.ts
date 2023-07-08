@@ -28,7 +28,7 @@ const streamAndClipAudio = async (
     ffmpeg(audioStream)
       .setStartTime(start)
       .setDuration(end - start)
-      .audioBitrate(320)
+      .audioBitrate(128)
       .format('mp3')
       .output(outPutFilePath)
       .on('end', resolve)

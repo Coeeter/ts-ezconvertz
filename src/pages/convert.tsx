@@ -15,6 +15,7 @@ import { useRouter } from 'next/router';
 import FormItem from '../components/FormItem';
 import Navbar from '../components/Navbar';
 import { useService } from '../context/VideoServiceContext';
+import SeoHead from '@/components/SeoHead';
 
 export type FormValues = {
   videos: {
@@ -81,64 +82,70 @@ export default function Convert() {
   }, [fields]);
 
   return (
-    <VStack minH="100vh">
-      <Navbar />
-      <Box
-        w="100%"
-        p={{ base: 5, sm: 10 }}
-        display="flex"
-        justifyContent="center"
-      >
-        <VStack
-          as="form"
-          onSubmit={handleSubmit(onSubmit)}
-          w={{ base: 'md', lg: 'lg', xl: 'xl' }}
-          gap={3}
+    <>
+      <SeoHead
+        title="EZConvertz | Convert"
+        description="Easily convert multiple youtube videos to mp3 files in one go."
+      />
+      <VStack minH="100vh">
+        <Navbar />
+        <Box
+          w="100%"
+          p={{ base: 5, sm: 10 }}
+          display="flex"
+          justifyContent="center"
         >
-          {fields.map((field, index) => (
-            <Box w="100%" position="relative" overflow="hidden" key={index}>
-              <FormItem
-                key={field.id}
-                index={index}
-                control={control}
-                setValue={setValue}
-              />
-              {index != 0 ? (
-                <CloseButton
-                  position="absolute"
-                  top={5}
-                  right={5}
-                  onClick={() => remove(index)}
+          <VStack
+            as="form"
+            onSubmit={handleSubmit(onSubmit)}
+            w={{ base: 'md', lg: 'lg', xl: 'xl' }}
+            gap={3}
+          >
+            {fields.map((field, index) => (
+              <Box w="100%" position="relative" overflow="hidden" key={index}>
+                <FormItem
+                  key={field.id}
+                  index={index}
+                  control={control}
+                  setValue={setValue}
                 />
-              ) : null}
-            </Box>
-          ))}
-          <HStack w="100%" gap={3}>
-            <Button
-              w="50%"
-              key="add"
-              isDisabled={isLoading}
-              onClick={() => {
-                append({ name: '', videoId: '', end: '', start: '' });
-              }}
-              {...btnProps}
-            >
-              Add Video
-            </Button>
-            <Button
-              w="50%"
-              key="submit"
-              isDisabled={isLoading}
-              type="submit"
-              bg="red.500"
-              _hover={{ bg: 'red.600' }}
-              _active={{ bg: 'red.700' }}
-            >
-              {!isLoading ? 'Start converting' : <Spinner />}
-            </Button>
-          </HStack>
-        </VStack>
-      </Box>
-    </VStack>
+                {index != 0 ? (
+                  <CloseButton
+                    position="absolute"
+                    top={5}
+                    right={5}
+                    onClick={() => remove(index)}
+                  />
+                ) : null}
+              </Box>
+            ))}
+            <HStack w="100%" gap={3}>
+              <Button
+                w="50%"
+                key="add"
+                isDisabled={isLoading}
+                onClick={() => {
+                  append({ name: '', videoId: '', end: '', start: '' });
+                }}
+                {...btnProps}
+              >
+                Add Video
+              </Button>
+              <Button
+                w="50%"
+                key="submit"
+                isDisabled={isLoading}
+                type="submit"
+                bg="red.500"
+                _hover={{ bg: 'red.600' }}
+                _active={{ bg: 'red.700' }}
+              >
+                {!isLoading ? 'Start converting' : <Spinner />}
+              </Button>
+            </HStack>
+          </VStack>
+        </Box>
+      </VStack>
+    </>
   );
 }
