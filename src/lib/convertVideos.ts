@@ -6,6 +6,7 @@ import { S3 } from 'aws-sdk';
 import path from 'path';
 import { zip } from 'zip-a-folder';
 import Status from '@/models/Status';
+import ffmpegstatic from 'ffmpeg-static';
 
 const streamAndClipAudio = async (
   url: string,
@@ -15,6 +16,7 @@ const streamAndClipAudio = async (
 ) => {
   return new Promise((resolve, reject) => {
     const audioStream = ytdl(url, { filter: 'audioonly' });
+    ffmpeg.setFfmpegPath(ffmpegstatic!);
     ffmpeg(audioStream)
       .setStartTime(start)
       .setDuration(end - start)
