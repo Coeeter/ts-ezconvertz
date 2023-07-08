@@ -19,7 +19,6 @@ import {
   InputRightAddon,
   Spinner,
   Text,
-  useColorMode,
   VStack,
 } from '@chakra-ui/react';
 
@@ -36,7 +35,6 @@ export default function FormItem({
   control: Control<FormValues>;
   setValue: UseFormSetValue<FormValues>;
 }) {
-  const { colorMode } = useColorMode();
   const [isLoading, setIsLoading] = useState(false);
   const [videoMetaData, setVideoMetaData] = useState<YoutubeMetaData>();
   const service = useService();
@@ -105,9 +103,9 @@ export default function FormItem({
       w="100%"
       position="relative"
       border="2px"
-      borderColor={colorMode == 'dark' ? 'red.300' : 'red.500'}
+      borderColor={'red.300'}
       borderRadius="lg"
-      bg={colorMode == 'dark' ? 'red.900' : 'red.200'}
+      bg={'red.900'}
       p={5}
       gap={1}
     >

@@ -27,7 +27,6 @@ export type FormValues = {
 };
 
 export default function Convert() {
-  const { colorMode } = useColorMode();
   const service = useService();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -37,15 +36,6 @@ export default function Convert() {
     name: 'videos',
     control,
   });
-
-  const btnProps =
-    colorMode == 'light'
-      ? {
-          bg: 'red.200',
-          _hover: { bg: 'red.300' },
-          _active: { bg: 'red.400' },
-        }
-      : {};
 
   const onSubmit: SubmitHandler<FormValues> = async ({ videos }) => {
     setIsLoading(true);
@@ -127,7 +117,6 @@ export default function Convert() {
                 onClick={() => {
                   append({ name: '', videoId: '', end: '', start: '' });
                 }}
-                {...btnProps}
               >
                 Add Video
               </Button>
