@@ -12,6 +12,7 @@ const getTempDir = () => {
   const tempDir = process.env.IS_DEV
     ? path.join(process.cwd(), 'temp')
     : '/tmp';
+  console.log(tempDir);
   if (!existsSync(tempDir)) {
     mkdirSync(tempDir);
   }
