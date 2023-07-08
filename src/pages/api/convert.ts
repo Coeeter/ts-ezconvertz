@@ -8,10 +8,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import { v4 } from 'uuid';
 
-export const config = {
-  runtime: 'edge',
-};
-
 const getTempDir = () => {
   const tempDir = process.env.IS_DEV
     ? path.join(process.cwd(), 'temp')

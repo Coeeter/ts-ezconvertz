@@ -28,7 +28,6 @@
     "react-hook-form": "^7.39.6",
     "typescript": "5.1.6",
     "uuid": "^9.0.0",
-    "webpack": "^5.88.1",
     "ytdl-core": "^4.11.4",
     "zip-a-folder": "^2.0.0"
   }

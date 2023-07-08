@@ -17,6 +17,7 @@ const streamAndClipAudio = async (
   return new Promise((resolve, reject) => {
     const audioStream = ytdl(url, { filter: 'audioonly' });
     Ffmpeg.setFfmpegPath(ffmpegstatic!);
+    // @ts-ignore
     Ffmpeg(audioStream)
       .setStartTime(start)
       .setDuration(end - start)
