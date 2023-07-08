@@ -8,6 +8,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import { v4 } from 'uuid';
 
+export const config = {
+  runtime: 'edge',
+};
+
 const getTempDir = () => {
   const tempDir = process.env.IS_DEV
     ? path.join(process.cwd(), 'temp')
@@ -64,7 +68,7 @@ export default async function handler(
 
   try {
     await saveStatus('pending');
-    convertVideos(videoDataList, session, outPutDir, zipPath, saveStatus);
+    await convertVideos(videoDataList, session, outPutDir, zipPath, saveStatus);
     if (res.headersSent) return;
     res.json({ session });
   } catch (e) {
