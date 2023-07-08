@@ -64,7 +64,7 @@ export default async function handler(
 
   try {
     await saveStatus('pending');
-    await convertVideos(videoDataList, session, outPutDir, zipPath, saveStatus);
+    convertVideos(videoDataList, session, outPutDir, zipPath, saveStatus);
     if (res.headersSent) return;
     res.json({ session });
   } catch (e) {
