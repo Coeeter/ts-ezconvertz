@@ -51,14 +51,14 @@ export default function Convert() {
     setIsLoading(true);
     const filtered = videos.filter(vid => vid.videoId.length != 0);
     if (filtered.length == 0) return setIsLoading(false);
-    const url = await service.convertVideos(
+    const session = await service.convertVideos(
       filtered.map(vid => ({
         ...vid,
         start: service?.transformTimeStringToSeconds(vid.start),
         end: service?.transformTimeStringToSeconds(vid.end),
       }))
     )!;
-    router.push(`/download?p=${url}`);
+    router.push(`/download/${session}`);
   };
 
   useEffect(() => {

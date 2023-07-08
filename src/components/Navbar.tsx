@@ -21,7 +21,7 @@ export default function Navbar() {
       justifyContent="space-between"
     >
       <HStack cursor="pointer" as={Link} href="/">
-        <Image src="ezconvertz-logo.svg" w="3rem" />
+        <Image src="/ezconvertz-logo.svg" w="3rem" />
         <Heading size="md">EZConvertz</Heading>
       </HStack>
       <IconButton

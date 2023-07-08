@@ -36,7 +36,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     res.setHeader('Content-Type', 'application/zip');
     readSteam.pipe(res);
     readSteam.on('end', async () => {
-      await deleteFileFromS3(fileName);
+      await Promise.all([
+        deleteFileFromS3(fileName),
+        deleteFileFromS3(session as string),
+        deleteFileFromS3(`requests/${session}.json`),
+      ]);
     });
   } catch (e) {
     console.log(e);
