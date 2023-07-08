@@ -9,7 +9,9 @@ import path from 'path';
 import { v4 } from 'uuid';
 
 const getTempDir = () => {
-  const tempDir = path.join(process.cwd(), 'temp');
+  const tempDir = process.env.IS_DEV
+    ? path.join(process.cwd(), 'temp')
+    : '/tmp';
   if (!existsSync(tempDir)) {
     mkdirSync(tempDir);
   }
