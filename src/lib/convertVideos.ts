@@ -9,9 +9,20 @@ import ffmpegstatic from 'ffmpeg-static';
 import Ffmpeg from 'fluent-ffmpeg';
 import NodeID3 from 'node-id3';
 import axios from 'axios';
+import { createWriteStream, unlinkSync } from 'fs';
+import ytMusic from './ytMusic';
+
+Ffmpeg.setFfmpegPath(ffmpegstatic!);
+
+const getImageBuffer = async (url: string) => {
+  const arrayBuffer = await axios.get(url, {
+    responseType: 'arraybuffer',
+  });
+  return Buffer.from(arrayBuffer.data);
+};
 
 const streamAndClipAudio = async (
-  url: string,
+  videoId: string,
   outPutFilePath: string,
   title: string,
   artist: string,
@@ -20,56 +31,55 @@ const streamAndClipAudio = async (
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const data = await ytdl.getBasicInfo(url);
+      const data = await ytdl.getBasicInfo(videoId);
+      const song = await ytMusic.getSong(videoId);
       const bitrate =
         data.formats
           .map(f => f.audioBitrate)
           .filter(f => !!f)
           .sort((a, b) => b! - a!)[0] || 128;
-      const audioStream = ytdl(url, {
+      const audioStream = ytdl(videoId, {
         filter: 'audioonly',
         quality: 'highest',
       });
-      Ffmpeg.setFfmpegPath(ffmpegstatic!);
+      const file = createWriteStream(outPutFilePath);
       Ffmpeg(audioStream)
+        .audioBitrate(bitrate)
+        .withAudioCodec('libmp3lame')
         .setStartTime(start)
         .setDuration(end - start)
-        .audioBitrate(bitrate)
-        .format('mp3')
-        .output(outPutFilePath)
-        .on('end', async () => {
-          const arrayBuffer = await axios.get(
-            data.videoDetails.thumbnails[
-              data.videoDetails.thumbnails.length - 1
-            ].url,
-            {
-              responseType: 'arraybuffer',
-            }
-          );
-          const buffer = Buffer.from(arrayBuffer.data);
-          const success = NodeID3.write(
-            {
-              title,
-              artist,
-              image: {
-                imageBuffer: buffer,
-                mime: 'image/png',
-                type: {
-                  id: 3,
+        .toFormat('mp3')
+        .pipe(file)
+        .on('finish', () => {
+          getImageBuffer(song.thumbnails.at(-1)!.url).then(async buffer => {
+            const success = NodeID3.write(
+              {
+                title,
+                artist,
+                image: {
+                  mime: 'image/jpeg',
+                  type: { id: 3 },
+                  description: 'cover',
+                  imageBuffer: buffer,
                 },
-                description: 'cover',
               },
-            },
-            outPutFilePath
-          );
-          if (!success) {
-            return reject('Failed to write metadata');
-          }
-          resolve(outPutFilePath);
+              outPutFilePath
+            );
+            if (success !== true) {
+              unlinkSync(outPutFilePath);
+              return reject();
+            }
+            resolve(outPutFilePath);
+          });
         })
-        .on('error', reject)
-        .run();
+        .on('error', e => {
+          console.log(e);
+          unlinkSync(outPutFilePath);
+          reject(e);
+        });
     } catch (e) {
+      console.log(e);
+      unlinkSync(outPutFilePath);
       reject(e);
     }
   });
@@ -107,7 +117,7 @@ const convertVideos = async (
   const conversions = videos.map(async videoData => {
     try {
       await streamAndClipAudio(
-        `https://youtube.com/watch?v=${videoData.videoId}`,
+        videoData.videoId,
         path.join(outPutDir, `${videoData.name}.mp3`),
         videoData.name,
         videoData.artist,

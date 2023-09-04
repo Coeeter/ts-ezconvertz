@@ -30,7 +30,8 @@
     "react-hook-form": "^7.39.6",
     "typescript": "5.1.6",
     "uuid": "^9.0.0",
-    "ytdl-core": "^4.11.4",
+    "ytdl-core": "^4.11.5",
+    "ytmusic-api": "^4.3.0",
     "zip-a-folder": "^2.0.0"
   }
 }

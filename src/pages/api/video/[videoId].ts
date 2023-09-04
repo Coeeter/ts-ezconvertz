@@ -1,3 +1,4 @@
+import ytMusic from '@/lib/ytMusic';
 import { NextApiRequest, NextApiResponse } from 'next';
 import ytdl from 'ytdl-core';
 
@@ -12,12 +13,12 @@ export default async function handler(
     return res.status(400).json({ message: 'Invalid videoId' });
   try {
     const video = await ytdl.getInfo(videoId as string);
-    const lastPic = video.videoDetails.thumbnails.length - 1;
+    const song = await ytMusic.getSong(videoId as string);
     res.json({
-      name: video.videoDetails.title,
+      name: song.name,
       length: video.videoDetails.lengthSeconds,
-      thumbnail: video.videoDetails.thumbnails[lastPic].url,
-      artist: video.videoDetails.author.name,
+      thumbnail: song.thumbnails.at(-1)!.url,
+      artist: song.artists?.map(a => a.name).join(', '),
     });
   } catch (e) {
     console.log(e);
