@@ -7,26 +7,71 @@ import { zip } from 'zip-a-folder';
 import Status from '@/models/Status';
 import ffmpegstatic from 'ffmpeg-static';
 import Ffmpeg from 'fluent-ffmpeg';
+import NodeID3 from 'node-id3';
+import axios from 'axios';
 
 const streamAndClipAudio = async (
   url: string,
   outPutFilePath: string,
+  title: string,
+  artist: string,
   start: number,
   end: number
 ) => {
-  return new Promise((resolve, reject) => {
-    const audioStream = ytdl(url, { filter: 'audioonly' });
-    Ffmpeg.setFfmpegPath(ffmpegstatic!);
-    // @ts-ignore
-    Ffmpeg(audioStream)
-      .setStartTime(start)
-      .setDuration(end - start)
-      .audioBitrate(128)
-      .format('mp3')
-      .output(outPutFilePath)
-      .on('end', resolve)
-      .on('error', reject)
-      .run();
+  return new Promise(async (resolve, reject) => {
+    try {
+      const data = await ytdl.getBasicInfo(url);
+      const bitrate =
+        data.formats
+          .map(f => f.audioBitrate)
+          .filter(f => !!f)
+          .sort((a, b) => b! - a!)[0] || 128;
+      const audioStream = ytdl(url, {
+        filter: 'audioonly',
+        quality: 'highest',
+      });
+      Ffmpeg.setFfmpegPath(ffmpegstatic!);
+      Ffmpeg(audioStream)
+        .setStartTime(start)
+        .setDuration(end - start)
+        .audioBitrate(bitrate)
+        .format('mp3')
+        .output(outPutFilePath)
+        .on('end', async () => {
+          const arrayBuffer = await axios.get(
+            data.videoDetails.thumbnails[
+              data.videoDetails.thumbnails.length - 1
+            ].url,
+            {
+              responseType: 'arraybuffer',
+            }
+          );
+          const buffer = Buffer.from(arrayBuffer.data);
+          const success = NodeID3.write(
+            {
+              title,
+              artist,
+              image: {
+                imageBuffer: buffer,
+                mime: 'image/png',
+                type: {
+                  id: 3,
+                },
+                description: 'cover',
+              },
+            },
+            outPutFilePath
+          );
+          if (!success) {
+            return reject('Failed to write metadata');
+          }
+          resolve(outPutFilePath);
+        })
+        .on('error', reject)
+        .run();
+    } catch (e) {
+      reject(e);
+    }
   });
 };
 
@@ -64,6 +109,8 @@ const convertVideos = async (
       await streamAndClipAudio(
         `https://youtube.com/watch?v=${videoData.videoId}`,
         path.join(outPutDir, `${videoData.name}.mp3`),
+        videoData.name,
+        videoData.artist,
         videoData.start,
         videoData.end
       );

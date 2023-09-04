@@ -77,6 +77,10 @@ export default function FormItem({
       setValue(`videos.${index}.name`, videoMetaData?.name, {
         shouldValidate: true,
       });
+    if (videoMetaData?.artist)
+      setValue(`videos.${index}.artist`, videoMetaData?.artist, {
+        shouldValidate: true,
+      });
     if (videoMetaData?.length)
       setValue(
         `videos.${index}.end`,
@@ -168,6 +172,23 @@ export default function FormItem({
             />
             <FormErrorMessage>
               {control.getFieldState(`videos.${index}.name`).error?.message}
+            </FormErrorMessage>
+          </FormControl>
+          <FormControl
+            isInvalid={
+              control.getFieldState(`videos.${index}.artist`).error != null
+            }
+          >
+            <FormLabel>Artist</FormLabel>
+            <Input
+              noOfLines={4}
+              placeholder="Artist"
+              {...control.register(`videos.${index}.artist`, {
+                required: 'Artist is required',
+              })}
+            />
+            <FormErrorMessage>
+              {control.getFieldState(`videos.${index}.artist`).error?.message}
             </FormErrorMessage>
           </FormControl>
           <HStack w="100%">

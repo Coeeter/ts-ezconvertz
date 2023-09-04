@@ -17,6 +17,7 @@ export default async function handler(
       name: video.videoDetails.title,
       length: video.videoDetails.lengthSeconds,
       thumbnail: video.videoDetails.thumbnails[lastPic].url,
+      artist: video.videoDetails.author.name,
     });
   } catch (e) {
     console.log(e);

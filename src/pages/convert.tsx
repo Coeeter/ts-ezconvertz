@@ -7,7 +7,6 @@ import {
   CloseButton,
   HStack,
   Spinner,
-  useColorMode,
   VStack,
 } from '@chakra-ui/react';
 
@@ -21,6 +20,7 @@ export type FormValues = {
   videos: {
     name: string;
     videoId: string;
+    artist: string;
     start: string;
     end: string;
   }[];
@@ -53,7 +53,13 @@ export default function Convert() {
 
   useEffect(() => {
     if (fields.length != 0) return;
-    append({ name: '', videoId: '', start: '00:00:00', end: '00:00:00' });
+    append({
+      name: '',
+      videoId: '',
+      artist: '',
+      start: '00:00:00',
+      end: '00:00:00',
+    });
   }, []);
 
   useEffect(() => {
@@ -115,7 +121,13 @@ export default function Convert() {
                 key="add"
                 isDisabled={isLoading}
                 onClick={() => {
-                  append({ name: '', videoId: '', end: '', start: '' });
+                  append({
+                    name: '',
+                    videoId: '',
+                    artist: '',
+                    end: '',
+                    start: '',
+                  });
                 }}
               >
                 Add Video

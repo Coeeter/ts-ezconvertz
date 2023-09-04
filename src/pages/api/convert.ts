@@ -31,6 +31,7 @@ export default async function handler(
   const zipPath = path.join(getTempDir(), `${session}.zip`);
 
   const { videos } = req.body;
+
   if (!videos || videos.length == 0) {
     return res.status(400).json({ message: 'Invalid videos' });
   }

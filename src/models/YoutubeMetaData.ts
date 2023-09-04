@@ -1,9 +1,10 @@
 interface YoutubeMetaData {
   videoId: string;
-  name?: string | undefined;
-  length?: number | undefined;
-  message?: string | undefined;
-  thumbnail?: string | undefined;
+  name?: string;
+  length?: number;
+  message?: string;
+  thumbnail?: string;
+  artist?: string;
 }
 
 export default YoutubeMetaData;
