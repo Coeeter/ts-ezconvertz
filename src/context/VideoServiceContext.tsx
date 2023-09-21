@@ -1,7 +1,6 @@
-import { createContext, useContext } from 'react';
-import Status from '@/models/Status';
 import VideoData from '@/models/VideoData';
 import YoutubeMetaData from '@/models/YoutubeMetaData';
+import { createContext, useContext } from 'react';
 
 type VideoServiceContextType = {
   getDownloadUrl: (session: string) => string;
@@ -9,7 +8,6 @@ type VideoServiceContextType = {
   transformSecondsToTimeString: (time: number) => string;
   getDataFromLink: (videoId: string) => Promise<YoutubeMetaData | undefined>;
   convertVideos: (data: VideoData[]) => Promise<string | undefined>;
-  getConversionStatus: (session: string) => Promise<Status | undefined>;
 };
 
 const VideoServiceContext = createContext<VideoServiceContextType | undefined>(
@@ -58,14 +56,6 @@ export const VideoServiceProvider = ({ children }: React.PropsWithChildren) => {
     return session as string;
   };
 
-  const getConversionStatus = async (session: string) => {
-    const res = await fetch(`/api/status/${session}`);
-    if (!res.ok) return;
-    const { status } = await res.json();
-    if (!status) return;
-    return status as Status;
-  };
-
   return (
     <VideoServiceContext.Provider
       value={{
@@ -74,7 +64,6 @@ export const VideoServiceProvider = ({ children }: React.PropsWithChildren) => {
         transformSecondsToTimeString,
         getDataFromLink,
         convertVideos,
-        getConversionStatus,
       }}
     >
       {children}

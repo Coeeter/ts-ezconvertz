@@ -1,15 +1,14 @@
 import VideoData from '@/models/VideoData';
-import { mkdir, readFile, rm } from 'fs/promises';
-import ytdl from 'ytdl-core';
 import { S3 } from 'aws-sdk';
-import path from 'path';
-import { zip } from 'zip-a-folder';
-import Status from '@/models/Status';
+import axios from 'axios';
 import ffmpegstatic from 'ffmpeg-static';
 import Ffmpeg from 'fluent-ffmpeg';
-import NodeID3 from 'node-id3';
-import axios from 'axios';
 import { createWriteStream, unlinkSync } from 'fs';
+import { mkdir, readFile, rm } from 'fs/promises';
+import NodeID3 from 'node-id3';
+import path from 'path';
+import ytdl from 'ytdl-core';
+import { zip } from 'zip-a-folder';
 import ytMusic from './ytMusic';
 
 Ffmpeg.setFfmpegPath(ffmpegstatic!);
@@ -110,9 +109,7 @@ const convertVideos = async (
   session: string,
   outPutDir: string,
   zipPath: string,
-  saveStatus: (status: Status) => Promise<void>
 ) => {
-  await saveStatus('processing');
   await mkdir(outPutDir, { recursive: true });
   const conversions = videos.map(async videoData => {
     try {
@@ -146,7 +143,6 @@ const convertVideos = async (
   await Promise.all([
     rm(outPutDir, { recursive: true }),
     rm(zipPath),
-    saveStatus('done'),
   ]);
 };
 

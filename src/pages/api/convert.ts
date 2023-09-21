@@ -1,7 +1,5 @@
 import convertVideos from '@/lib/convertVideos';
-import Status from '@/models/Status';
 import VideoData from '@/models/VideoData';
-import { S3 } from 'aws-sdk';
 import { existsSync, mkdirSync } from 'fs';
 import { rm } from 'fs/promises';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -12,7 +10,6 @@ const getTempDir = () => {
   const tempDir = process.env.IS_DEV
     ? path.join(process.cwd(), 'temp')
     : '/tmp';
-  console.log(tempDir);
   if (!existsSync(tempDir)) {
     mkdirSync(tempDir);
   }
@@ -47,29 +44,11 @@ export default async function handler(
     return res.status(400).json({ message: 'Invalid videos' });
   }
 
-  const saveStatus = async (status: Status) => {
-    const s3 = new S3({
-      accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY!,
-    });
-
-    const bucketName = process.env.AWS_S3_BUCKET_NAME!;
-    const uploadConfig = {
-      Bucket: bucketName,
-      Key: session,
-      Body: Buffer.from(JSON.stringify({ status }), 'utf-8'),
-      ContentType: 'application/json',
-    };
-    await s3.upload(uploadConfig).promise();
-  };
-
   try {
-    await saveStatus('pending');
-    convertVideos(videoDataList, session, outPutDir, zipPath, saveStatus);
+    await convertVideos(videoDataList, session, outPutDir, zipPath);
     if (res.headersSent) return;
     res.json({ session });
   } catch (e) {
-    await saveStatus('error');
     console.log(e);
   } finally {
     if (existsSync(outPutDir)) {
